@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회사소개 — 엔티켓</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:        #5b3ea6;
+    --primary-light:  #7b5cc4;
+    --primary-pale:   #f0ecfb;
+    --primary-border: #d6caf0;
+    --accent:         #3c6fe0;
+    --accent-pale:    #e8f0fb;
+    --text-main:  #1a1a2e;
+    --text-sub:   #4b5060;
+    --text-muted: #9198a8;
+    --border:  #e4e4ec;
+    --bg:      #f8f8fc;
+    --white:   #ffffff;
+
+    --c-host:    #3c6fe0; --c-host-bg:    #e8f0fb;
+    --c-org:     #0f766e; --c-org-bg:     #ccfbf1;
+    --c-ticket:  #5b3ea6; --c-ticket-bg:  #f0ecfb;
+    --c-support: #b45309; --c-support-bg: #fef3c7;
+
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(91,62,166,0.07);
+    --shadow-md: 0 3px 12px rgba(91,62,166,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--white);
+    color: var(--text-main);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── 유틸리티 바 ── */
+  .util-bar {
+    background: #f4f4f8;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+  .util-bar a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+  .util-bar a:hover { color: var(--primary); }
+
+  /* ── 헤더 ── */
+  .header {
+    background: var(--white);
+    border-bottom: 2px solid var(--primary);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 64px;
+  }
+  .logo { display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
+  .logo-ko { font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
+  .logo-en { font-size: 22px; font-weight: 400; color: var(--accent); font-style: italic; }
+  .logo-en span { color: #e83a8a; font-weight: 700; }
+
+  .gnb { flex: 1; display: flex; justify-content: center; list-style: none; }
+  .gnb > li > a {
+    display: block; padding: 0 48px; height: 64px; line-height: 64px;
+    font-size: 13px; font-weight: 500; color: var(--text-main); text-decoration: none;
+    white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: color 0.15s;
+  }
+  .gnb > li > a:hover, .gnb > li > a.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ── 히어로 (v1 구조, 보라 계열 색상) ── */
+  .hero {
+    background: linear-gradient(135deg, #2d1a6b 0%, #5b3ea6 60%, #7b5cc4 100%);
+    color: white;
+    padding: 72px 40px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; right: -80px; top: -80px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero::after {
+    content: '';
+    position: absolute; right: 80px; bottom: -120px;
+    width: 280px; height: 280px; border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; }
+  .hero-eyebrow {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .hero-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 36px; font-weight: 600; line-height: 1.35;
+    margin-bottom: 18px; letter-spacing: -0.02em;
+  }
+  .hero-desc {
+    font-size: 15px; color: rgba(255,255,255,0.75);
+    max-width: 520px; line-height: 1.8;
+  }
+
+  /* ── 스탯 바 (v1 구조, 보라 색상) ── */
+  .stats-bar { background: var(--white); border-bottom: 1px solid var(--border); }
+  .stats-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex;
+  }
+  .stat-item {
+    flex: 1; padding: 24px 0; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--primary); line-height: 1; margin-bottom: 4px; }
+  .stat-num sup { font-size: 16px; font-weight: 400; }
+  .stat-label { font-size: 12px; color: var(--text-muted); }
+
+  /* ── 본문 ── */
+  .page-body { max-width: 900px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* ── 섹션 헤더 ── */
+  .sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; margin-top: 48px; }
+  .sec-head:first-child { margin-top: 0; }
+  .sec-head-bar { width: 4px; height: 20px; background: var(--primary); border-radius: 2px; flex-shrink: 0; }
+  .sec-head h2 { font-size: 16px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+  .sec-head-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── 회사 정보 테이블 ── */
+  .info-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-sm);
+  }
+  .info-table tr { border-bottom: 1px solid var(--border); }
+  .info-table tr:last-child { border-bottom: none; }
+  .info-table th {
+    background: var(--bg); color: var(--text-sub); font-weight: 500;
+    padding: 11px 18px; text-align: left; width: 130px;
+    white-space: nowrap; border-right: 1px solid var(--border);
+  }
+  .info-table td { padding: 11px 18px; color: var(--text-main); background: var(--white); }
+
+  /* ── 서비스 카드 ── */
+  .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .svc-card {
+    display: block; text-decoration: none; color: inherit;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 22px 18px; background: var(--white);
+    box-shadow: var(--shadow-sm); position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
+  }
+  .svc-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .svc-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 99px; margin-bottom: 10px;
+  }
+  .svc-tag-d { background: var(--primary-pale); color: var(--primary); }
+  .svc-tag-m { background: var(--accent-pale); color: var(--accent); }
+  .svc-name { font-size: 17px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; letter-spacing: -0.02em; }
+  .svc-desc { font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 14px; }
+  .svc-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .svc-pill { font-size: 11px; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--border); color: var(--text-sub); background: var(--bg); }
+  .svc-arrow { position: absolute; top: 22px; right: 18px; font-size: 18px; color: var(--primary-border); transition: color 0.2s; }
+  .svc-card:hover .svc-arrow { color: var(--primary); }
+
+  /* ── 범례 ── */
+  .legend { display: flex; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sub); }
+  .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── 타임라인 ── */
+  .timeline { display: flex; flex-direction: column; }
+  .tl-block {
+    display: flex; opacity: 0; transform: translateY(14px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .tl-block.vis { opacity: 1; transform: none; }
+  .tl-left {
+    width: 68px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; padding-top: 3px;
+  }
+  .tl-year {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    background: var(--primary-pale); border: 1px solid var(--primary-border);
+    border-radius: 99px; padding: 3px 9px; white-space: nowrap; line-height: 1.2;
+  }
+  .tl-track { flex: 1; width: 1px; background: var(--border); margin-top: 6px; min-height: 16px; }
+  .tl-right { flex: 1; padding-left: 16px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
+  .tl-item {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+    box-shadow: var(--shadow-sm); transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .tl-item:hover { border-color: var(--primary-border); box-shadow: var(--shadow-md); }
+  .tl-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .tl-body { flex: 1; }
+  .tl-title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 2px; }
+  .tl-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+  .role-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 99px; }
+  .r-host    { background: var(--c-host-bg);    color: var(--c-host); }
+  .r-org     { background: var(--c-org-bg);     color: var(--c-org); }
+  .r-ticket  { background: var(--c-ticket-bg);  color: var(--c-ticket); }
+  .r-support { background: var(--c-support-bg); color: var(--c-support); }
+
+  /* ── 연락처 ── */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .contact-map-placeholder {
+    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+    height: 170px; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 13px; flex-direction: column; gap: 8px;
+  }
+  .contact-rows { display: flex; flex-direction: column; gap: 10px; }
+  .contact-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; }
+  .c-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: var(--primary-pale); display: flex; align-items: center;
+    justify-content: center; font-size: 14px; flex-shrink: 0; color: var(--primary);
+  }
+  .c-label { font-size: 11px; color: var(--text-muted); margin-bottom: 1px; }
+  .c-val { font-size: 13px; font-weight: 500; color: var(--text-main); }
+
+  /* ── 풋터 ── */
+  .footer { background: #2a2a38; color: #aaa; padding: 28px 32px; font-size: 12px; line-height: 1.9; margin-top: 60px; }
+  .footer-inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  .footer-logo { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .footer a { color: #888; text-decoration: none; }
+  .footer a:hover { color: #fff; }
+  .footer-links { display: flex; gap: 14px; list-style: none; margin-bottom: 8px; }
+
+  @media (max-width: 640px) {
+    .gnb { display: none; }
+    .hero { padding: 48px 20px 40px; }
+    .hero-title { font-size: 26px; }
+    .stats-inner { flex-wrap: wrap; }
+    .stat-item { flex: 0 0 50%; border-right: none; border-bottom: 1px solid var(--border); }
+    .page-body { padding: 28px 16px 60px; }
+    .service-grid, .contact-grid { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 유틸리티 바 -->
+<div class="util-bar">
+  <a href="#">로그인</a>
+  <a href="#">회원가입</a>
+  <a href="#">예매확인/취소</a>
+  <a href="#">마이페이지</a>
+</div>
+
+<!-- 헤더 -->
+<header class="header">
+  <a class="logo" href="#">
+    <span class="logo-ko">엔티켓</span>
+    <span class="logo-en"><span>e</span>nticket</span>
+  </a>
+  <ul class="gnb">
+    <li><a href="#">공연예매</a></li>
+    <li><a href="#" class="active">회사소개</a></li>
+    <li><a href="#">고객센터</a></li>
+  </ul>
+</header>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">About Enticket</p>
+    <h1 class="hero-title">인천에서 시작된<br>공연·행사 티켓 플랫폼</h1>
+    <p class="hero-desc">
+      (주)엔엔터테인먼트가 운영하는 엔티켓은 인천문화예술회관을 비롯한
+      지역 공연장과 함께 티켓 발권·판매·주관을 담당하며
+      관객과 무대를 연결합니다.
+    </p>
+  </div>
+</section>
+
+<!-- 스탯 바 -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">2019</div>
+      <div class="stat-label">설립 연도</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">120<sup>+</sup></div>
+      <div class="stat-label">누적 발권 공연</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">6<sup>년</sup></div>
+      <div class="stat-label">인천문화예술회관 파트너십</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3<sup>개</sup></div>
+      <div class="stat-label">사업 분야</div>
+    </div>
+  </div>
+</div>
+
+<!-- 본문 -->
+<main class="page-body">
+
+  <!-- 회사 정보 -->
+  <div class="sec-head" style="margin-top:0;">
+    <div class="sec-head-bar"></div>
+    <h2>회사 정보</h2>
+    <div class="sec-head-line"></div>
+  </div>
+  <table class="info-table">
+    <tr><th>법인명</th><td>(주)엔엔터테인먼트</td></tr>
+    <tr><th>브랜드</th><td>enticket (엔티켓)</td></tr>
+    <tr><th>사업 분야</th><td>티켓 발권·판매, 공연 주최·주관, 디자인·영상 제작</td></tr>
+    <tr><th>주소</th><td>인천광역시 남동구 문화서로4번길 66, 지하1층</td></tr>
+    <tr><th>파트너</th><td>인천문화예술회관 / 문화인</td></tr>
+    <tr><th>홈페이지</th><td>enticket.com</td></tr>
+  </table>
+
+  <!-- 서비스 -->
+  <div class="sec-head">
+    <div class="sec-head-bar"></div>
+    <h2>서비스 안내</h2>
+    <div class="sec-head-line"></div>
+  </div>
+  <div class="service-grid">
+    <a class="svc-card" href="endesign.html">
+      <span class="svc-arrow">›</span>
+      <span class="svc-tag svc-tag-d">Design</span>
+      <div class="svc-name">엔디자인</div>
+      <div class="svc-desc">공연 포스터·리플렛부터 SNS 배너·로고까지,<br>공연 기획사와 사업자를 위한 디자인 서비스.</div>
+      <div class="svc-pills">
+        <span class="svc-pill">포스터·리플렛</span>
+        <span class="svc-pill">로고·명함</span>
+        <span class="svc-pill">웹 배너</span>
+        <span class="svc-pill">현수막</span>
+      </div>
+    </a>
+    <a class="svc-card" href="enmedia.html">
+      <span class="svc-arrow">›</span>
+      <span class="svc-tag svc-tag-m">Media</span>
+      <div class="svc-name">엔미디어</div>
+      <div class="svc-desc">공연 현장 촬영·편집, 홍보 영상 기획·제작.<br>무대의 감동을 영상으로 남깁니다.</div>
+      <div class="svc-pills">
+        <span class="svc-pill">공연 촬영</span>
+        <span class="svc-pill">홍보 영상</span>
+        <span class="svc-pill">편집·후반작업</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- 공연 이력 타임라인 -->
+  <div class="sec-head">
+    <div class="sec-head-bar"></div>
+    <h2>공연·행사 이력</h2>
+    <div class="sec-head-line"></div>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--c-host);"></div>주최</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--c-org);"></div>주관</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--c-ticket);"></div>발권·판매</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--c-support);"></div>협력</div>
+  </div>
+
+  <div class="timeline" id="tl">
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year">2025</div><div class="tl-track"></div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">인천시립교향악단 신년음악회</div><div class="tl-meta">2025.01 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-host);"></div><div class="tl-body"><div class="tl-title">인천 봄 클래식 페스티벌</div><div class="tl-meta">2025.04 · 인천문화예술회관 소공연장</div><span class="role-badge r-host">주최</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">남동구 어린이날 문화행사</div><div class="tl-meta">2025.05 · 남동문화예술회관</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+      </div>
+    </div>
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year">2024</div><div class="tl-track"></div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">뮤지컬 〈라이온 킹〉 인천 공연</div><div class="tl-meta">2024.02 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-org);"></div><div class="tl-body"><div class="tl-title">인천 재즈 페스티벌 2024</div><div class="tl-meta">2024.08 · 인천아트플랫폼 야외무대</div><span class="role-badge r-org">주관</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">이문세 콘서트 〈Re:Birth〉 인천</div><div class="tl-meta">2024.10 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-support);"></div><div class="tl-body"><div class="tl-title">인천국제무용제</div><div class="tl-meta">2024.11 · 인천문화예술회관 대·소공연장</div><span class="role-badge r-support">협력</span></div></div>
+      </div>
+    </div>
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year">2023</div><div class="tl-track"></div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">인천시립무용단 정기공연</div><div class="tl-meta">2023.03 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-host);"></div><div class="tl-body"><div class="tl-title">청소년 오케스트라 축제</div><div class="tl-meta">2023.06 · 남동문화예술회관</div><span class="role-badge r-host">주최</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-org);"></div><div class="tl-body"><div class="tl-title">인천 마라톤 대회 행사 운영</div><div class="tl-meta">2023.10 · 인천 송도 일원</div><span class="role-badge r-org">주관</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">인천시립합창단 가을정기연주회</div><div class="tl-meta">2023.11 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+      </div>
+    </div>
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year">2022</div><div class="tl-track"></div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">인천시립교향악단 특별연주회</div><div class="tl-meta">2022.05 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-org);"></div><div class="tl-body"><div class="tl-title">구월동 문화축제</div><div class="tl-meta">2022.09 · 인천 구월문화로 일원</div><span class="role-badge r-org">주관</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">연말 가족뮤지컬 〈신데렐라〉</div><div class="tl-meta">2022.12 · 인천문화예술회관 소공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+      </div>
+    </div>
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year">2021</div><div class="tl-track"></div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">인천시립무용단 기획공연</div><div class="tl-meta">2021.06 · 인천문화예술회관 대공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-host);"></div><div class="tl-body"><div class="tl-title">인천 소규모 공연 지원 사업</div><div class="tl-meta">2021.09 ~ 11 · 인천 내 소공연장 다수</div><span class="role-badge r-host">주최</span></div></div>
+      </div>
+    </div>
+
+    <div class="tl-block">
+      <div class="tl-left"><div class="tl-year" style="font-size:10px; padding:3px 7px;">2019–20</div></div>
+      <div class="tl-right">
+        <div class="tl-item"><div class="tl-dot" style="background:var(--c-ticket);"></div><div class="tl-body"><div class="tl-title">엔티켓 서비스 론칭 및 초기 파트너 공연 발권</div><div class="tl-meta">2019 ~ 2020 · 인천문화예술회관 및 파트너 공연장</div><span class="role-badge r-ticket">발권·판매</span></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 연락처 -->
+  <div class="sec-head">
+    <div class="sec-head-bar"></div>
+    <h2>연락처 및 위치</h2>
+    <div class="sec-head-line"></div>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-map-placeholder">🗺️<span>지도 영역 (네이버 지도 API 연동)</span></div>
+    <div class="contact-rows">
+      <div class="contact-row"><div class="c-icon">📍</div><div><div class="c-label">주소</div><div class="c-val">인천광역시 남동구 문화서로4번길 66, 지하1층</div></div></div>
+      <div class="contact-row"><div class="c-icon">📞</div><div><div class="c-label">전화</div><div class="c-val">1588-2341</div></div></div>
+      <div class="contact-row"><div class="c-icon">📠</div><div><div class="c-label">팩스</div><div class="c-val">032-618-5727</div></div></div>
+      <div class="contact-row"><div class="c-icon">🕐</div><div><div class="c-label">운영 시간</div><div class="c-val">평일 10:00 – 18:00 (주말·공휴일 1:1 문의)</div></div></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- 풋터 -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">엔티켓 enticket</div>
+      <div>(주)엔엔터테인먼트 · 대표: 박동현 · 사업자등록번호: 131-81-83599</div>
+      <div>인천광역시 남동구 문화서로4번길 66, 지하1층 · Tel. 1588-2341 · Fax. 032-618-5727</div>
+      <div style="margin-top:6px;">© 2019 enticket.com All rights reserved.</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#">회사소개</a></li>
+      <li><a href="#">개인정보처리방침</a></li>
+      <li><a href="#">이용약관</a></li>
+      <li><a href="#">기사사업자 등록안내</a></li>
+      <li><a href="#">사이트맵</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  const blocks = document.querySelectorAll('.tl-block');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  blocks.forEach((b, i) => {
+    b.style.transitionDelay = (i * 0.07) + 's';
+    io.observe(b);
+  });
+  blocks[0].classList.add('vis');
+</script>
+</body>
+</html>

@@ -62,7 +62,7 @@
     display: flex;
     align-items: center;
     gap: 24px;
-    height: 64px;
+    height: 50px;
   }
   .logo { display: flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
   .logo-ko { font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
@@ -71,7 +71,7 @@
 
   .gnb { flex: 1; display: flex; justify-content: center; list-style: none; }
   .gnb > li > a {
-    display: block; padding: 0 48px; height: 64px; line-height: 64px;
+    display: block; padding: 0 48px; height: 50px; line-height: 50px;
     font-size: 13px; font-weight: 500; color: var(--text-main); text-decoration: none;
     white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px;
     transition: color 0.15s;
@@ -138,20 +138,31 @@
   .sec-head h2 { font-size: 16px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
   .sec-head-line { flex: 1; height: 1px; background: var(--border); }
 
-  /* ── 회사 정보 테이블 ── */
-  .info-table {
-    width: 100%; border-collapse: collapse; font-size: 13px;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; box-shadow: var(--shadow-sm);
+  /* ── 회사 정보 카드 그리드 ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
-  .info-table tr { border-bottom: 1px solid var(--border); }
-  .info-table tr:last-child { border-bottom: none; }
-  .info-table th {
-    background: var(--bg); color: var(--text-sub); font-weight: 500;
-    padding: 11px 18px; text-align: left; width: 130px;
-    white-space: nowrap; border-right: 1px solid var(--border);
+  .info-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
   }
-  .info-table td { padding: 11px 18px; color: var(--text-main); background: var(--white); }
+  .info-card-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .info-card-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
 
   /* ── 서비스 카드 ── */
   .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -321,14 +332,32 @@
     <h2>회사 정보</h2>
     <div class="sec-head-line"></div>
   </div>
-  <table class="info-table">
-    <tr><th>법인명</th><td>(주)엔엔터테인먼트</td></tr>
-    <tr><th>브랜드</th><td>enticket (엔티켓)</td></tr>
-    <tr><th>사업 분야</th><td>티켓 발권·판매, 공연 주최·주관, 디자인·영상 제작</td></tr>
-    <tr><th>주소</th><td>인천광역시 남동구 문화서로4번길 66, 지하1층</td></tr>
-    <tr><th>파트너</th><td>인천문화예술회관 / 문화인</td></tr>
-    <tr><th>홈페이지</th><td>enticket.com</td></tr>
-  </table>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-label">법인명</div>
+      <div class="info-card-value">(주)엔엔터테인먼트</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">브랜드</div>
+      <div class="info-card-value">enticket (엔티켓)</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">사업 분야</div>
+      <div class="info-card-value">티켓 발권·판매, 공연 주최·주관, 디자인·영상 제작</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">주소</div>
+      <div class="info-card-value">인천광역시 남동구 문화서로4번길 66, 지하1층</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">파트너</div>
+      <div class="info-card-value">인천문화예술회관 / 문화인</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">홈페이지</div>
+      <div class="info-card-value">enticket.com</div>
+    </div>
+  </div>
 
   <!-- 서비스 -->
   <div class="sec-head">

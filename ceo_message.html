@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회사소개 - (주)엔엔터테인먼트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Square:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+
+    /* =============================================
+       CSS 변수
+    ============================================= */
+    :root {
+      --purple:       #602b89;
+      --purple-dark:  #4a1f6a;
+      --purple-light: #f3edf9;
+      --white:        #ffffff;
+      --gray-light:   #f4f4f6;
+      --gray-mid:     #e1e1e1;
+      --gray-text:    #929294;
+      --black:        #2c2c2c;
+      --footer-bg:    #2f2f2f;
+      --font:         'Nanum Square', '나눔스퀘어', sans-serif;
+
+      /* 리퀴드 글래스 — 예비 토큰(현재 미사용). 실제 글래스 요소는
+         개별 rgba 값을 사용하므로, 통일하려면 각 요소를 var()로 교체할 것 */
+      --glass-bg:     rgba(255, 255, 255, 0.15);
+      --glass-blur:   blur(20px);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* =============================================
+       리셋
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body { font-family: var(--font); color: var(--white); background: var(--white); }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    ul, ol { list-style: none; }
+
+    /* =============================================
+       전체 래퍼
+    ============================================= */
+    .site-wrap {
+      position: relative;
+    }
+
+    /* 헤더+GNB — 상단에 고정 위치 (sticky 아님) */
+    .floating-nav {
+      position: relative;
+      z-index: 100;
+      background-color: #1a0a2e;
+    }
+    /* 배경 이미지 크로스페이드 레이어 2개 */
+    .floating-nav__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center top;
+      opacity: 1;
+      transition: opacity 0.9s ease;
+    }
+    .floating-nav__bg.layer-a { z-index: 0; }
+    .floating-nav__bg.layer-b { z-index: 1; opacity: 0; }
+    /* 헤더/GNB 내부 콘텐츠는 배경 위에 */
+    .header, .gnb {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* =============================================
+       추적 헤더 (스크롤 시 등장 — 헤더만, 투명 글래스)
+    ============================================= */
+    .sticky-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    .sticky-nav.is-visible {
+      transform: translateY(0);
+    }
+    .sticky-nav__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .sticky-nav__logo { flex-shrink: 0; }
+    .sticky-nav__logo img {
+      height: 68px;
+      width: auto;
+    }
+    .sticky-nav__search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+    .sticky-nav__search input {
+      width: 100%;
+      height: 38px;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.3);
+      border-radius: 999px;
+      padding: 0 44px 0 16px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: #000000;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .sticky-nav__search input::placeholder { color: rgba(0,0,0,0.5); }
+    .sticky-nav__search input:focus {
+      background: rgba(0,0,0,0.08);
+      border-color: rgba(0,0,0,0.5);
+    }
+    .sticky-nav__search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #000000;
+      display: flex;
+      align-items: center;
+    }
+    .sticky-nav__search-btn svg {
+      width: 17px; height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+    .sticky-nav__utils {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .sticky-nav__util-link {
+      font-size: 12px;
+      color: #000000;
+      padding: 0 8px;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .sticky-nav__util-link:hover { color: var(--purple); }
+    .sticky-nav__util-divider {
+      font-size: 11px;
+      color: rgba(0,0,0,0.3);
+    }
+    /* 추적 헤더 모바일용 검색 아이콘 (데스크탑 숨김 / 밝은 글래스 위라 다크) */
+    .sticky-nav__search-icon {
+      display: none;
+      align-items: center;
+      margin-left: auto;
+      color: rgba(0,0,0,0.7);
+    }
+    .sticky-nav__search-icon svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    /* =============================================
+       최상단 이동 버튼 (투명 리퀴드 글래스)
+    ============================================= */
+    .top-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 300;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+      pointer-events: none;
+    }
+    .top-btn.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .top-btn:hover { background: rgba(255,255,255,0.28); }
+    .top-btn svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: rgba(0,0,0,0.7);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* =============================================
+       헤더 (리퀴드 글래스)
+       - 로고 (좌측)
+       - 검색창 (중앙)
+       - 로그인/회원가입/예매확인 (우측)
+    ============================================= */
+    .header {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .header__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* 로고 */
+    .logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .logo__img {
+      height: 68px;
+      width: auto;
+      mix-blend-mode: screen;
+    }
+
+    /* 검색창 */
+    .search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+    .search__input {
+      width: 100%;
+      height: 38px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 999px;
+      padding: 0 44px 0 16px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: #ffffff;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .search__input::placeholder { color: rgba(255,255,255,0.65) !important; }
+    .search__input::-webkit-input-placeholder { color: rgba(255,255,255,0.65); }
+    .search__input::-moz-placeholder { color: rgba(255,255,255,0.65); }
+    .search__input:focus {
+      background: rgba(255,255,255,0.28);
+      border-color: rgba(255,255,255,0.7);
+    }
+    .search__btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      transition: color 0.2s;
+    }
+    .search__btn svg {
+      width: 17px; height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    /* 우측 유틸 링크 */
+    .header__utils {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .header__util-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      padding: 0 8px;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .header__util-link:hover { color: var(--white); }
+    .header__util-divider {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* =============================================
+       GNB (리퀴드 글래스)
+    ============================================= */
+    .gnb {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .gnb__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .gnb__inner::-webkit-scrollbar { display: none; }
+    .gnb__item {
+      flex-shrink: 0;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .gnb__item:hover {
+      color: var(--white);
+      border-bottom-color: rgba(255,255,255,0.7);
+    }
+    .gnb__item.active {
+      color: var(--white);
+      border-bottom-color: var(--white);
+      font-weight: 900;
+    }
+
+    /* =============================================
+       히어로 배너 (슬라이더)
+       헤더+GNB가 위에 떠있음
+    ============================================= */
+    .hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 2000 / 460;
+      overflow: hidden;
+      background: #1a0a2e;
+    }
+    .hero__slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+    .hero__slide.active { opacity: 1; }
+    .hero__slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .hero__slide picture {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .hero__slide picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* 슬라이드 위 그라디언트 */
+    .hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(20,5,40,0.6) 0%,
+        rgba(20,5,40,0.2) 60%,
+        transparent 100%
+      );
+    }
+    /* 슬라이드 텍스트 (현재 마크업 미사용 — 배너에 캡션 추가 시 사용) */
+    .hero__content {
+      position: absolute;
+      bottom: 80px;
+      left: 5%;
+      max-width: 500px;
+    }
+    .hero__label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .hero__title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    }
+    .hero__date {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 20px;
+    }
+    .hero__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      background: var(--purple);
+      color: var(--white);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .hero__btn:hover {
+      background: var(--purple-dark);
+      transform: translateY(-1px);
+    }
+    /* 슬라이더 도트 */
+    .hero__dots {
+      position: absolute;
+      bottom: 28px;
+      left: 5%;
+      display: flex;
+      gap: 6px;
+    }
+    .hero__dot {
+      width: 28px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    .hero__dot.active {
+      width: 44px;
+      background: var(--white);
+    }
+    /* 슬라이더 화살표 */
+    .hero__arrows {
+      position: absolute;
+      bottom: 20px;
+      right: 24px;
+      display: flex;
+      gap: 8px;
+    }
+    .hero__arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .hero__arrow:hover { background: rgba(255,255,255,0.3); }
+
+    /* =============================================
+       컨텐츠 영역
+    ============================================= */
+    .page-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      color: var(--black);
+    }
+
+    /* 섹션 헤더 */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -0.03em;
+    }
+    .section-accent { color: var(--purple); }
+    .section-more {
+      font-size: 13px;
+      color: var(--gray-text);
+      transition: color 0.2s;
+    }
+    .section-more:hover { color: var(--purple); }
+
+    /* 공연 카드 그리드 — 4열 */
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .perf-card {
+      display: block;
+      color: var(--black);
+      transition: transform 0.2s;
+    }
+    .perf-card:hover { transform: translateY(-4px); }
+    .perf-card__poster {
+      width: 100%;
+      aspect-ratio: 238 / 331;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--purple-light);
+      margin-bottom: 10px;
+    }
+    .perf-card__poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .perf-card:hover .perf-card__poster img { transform: scale(1.04); }
+    .perf-card__info { padding: 0 2px; }
+    .perf-card__title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .perf-card__venue {
+      font-size: 12px;
+      color: var(--gray-text);
+      margin-bottom: 3px;
+    }
+    .perf-card__date {
+      font-size: 12px;
+      color: var(--gray-text);
+    }
+
+    /* 반응형 */
+    @media (max-width: 1024px) {
+      .perf-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .perf-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .section-title { font-size: 16px; }
+    }
+
+    /* =============================================
+       푸터
+    ============================================= */
+    .footer {
+      width: 100%;
+      background: var(--footer-bg);
+      color: var(--white);
+    }
+    .footer__links {
+      border-bottom: 1px solid #424242;
+    }
+    .footer__links-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .footer__link {
+      font-size: 13px;
+      color: #9f9fa1;
+      padding: 0 14px;
+      border-right: 1px solid #424242;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .footer__link:first-child { padding-left: 0; }
+    .footer__link:last-child { border-right: none; }
+    .footer__link:hover { color: var(--white); }
+    .footer__info {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+    }
+    .footer__logo img {
+      height: 36px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.7;
+    }
+    .footer__text {
+      font-size: 12px;
+      color: #d5d5d5;
+      line-height: 2;
+    }
+    .footer__text strong { color: var(--white); }
+
+    /* =============================================
+       반응형
+    ============================================= */
+    @media (max-width: 768px) {
+      .hero { aspect-ratio: 720 / 430; }
+      .hero__title { font-size: 22px; }
+      .hero__content { bottom: 60px; }
+
+      .header__inner { height: 56px; padding: 0 16px; }
+      .logo__img { height: 56px; }   /* 모바일 헤더 바 높이(56px)에 맞춤 */
+      .search { display: none; }
+      .header__search-icon {        /* display 는 아래 base/미디어쿼리에서 일괄 제어 */
+        color: var(--white);
+        margin-left: auto;
+      }
+      .header__utils { margin-left: 8px; }
+      .header__util-link { font-size: 11px; padding: 0 5px; }
+
+      /* 추적 헤더 — 모바일에서 헤더와 동일 구성 (검색은 아이콘으로 축약) */
+      .sticky-nav__inner { height: 56px; padding: 0 16px; }
+      .sticky-nav__logo img { height: 56px; }
+      .sticky-nav__search { display: none; }
+      .sticky-nav__search-icon { display: flex; }
+      .sticky-nav__utils { margin-left: 8px; }
+      .sticky-nav__util-link { font-size: 11px; padding: 0 5px; }
+
+      .gnb__item { padding: 0 10px; font-size: 12px; height: 40px; }
+
+      .footer__info { flex-direction: column; gap: 16px; }
+      .footer__links-inner { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 4px; }
+    }
+    .header__search-icon { display: none; }
+    @media (max-width: 768px) {
+      .header__search-icon { display: flex; }
+    }
+
+
+    /* 기업소개 히어로 탭 외 숨김 */
+    body.tab-enticket .hero-main,
+    body.tab-ndesign  .hero-main,
+    body.tab-nmedia   .hero-main { display: none; }
+
+    /* =============================================
+       회사소개 전용 헤더
+    ============================================= */
+    .about-header {
+      background: linear-gradient(135deg, #1a0a2e 0%, #602b89 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .about-header__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: stretch;
+      height: 60px;
+    }
+    .about-header__brand {
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      padding-right: 32px;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .about-header__brand:hover { color: rgba(255,255,255,0.85); }
+    .about-header__tabs {
+      display: flex;
+      align-items: stretch;
+    }
+    .about-header__tab {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font);
+      color: rgba(255,255,255,0.65);
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      cursor: pointer;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+    .about-header__tab:hover { color: #ffffff; }
+    .about-header__tab.is-active {
+      color: #ffffff;
+      border-bottom-color: #ffffff;
+    }
+
+    /* =============================================
+       히어로
+    ============================================= */
+    .about-hero {
+      background: linear-gradient(135deg, #1a0a2e 0%, #602b89 60%, #3d1a5c 100%);
+      padding: 88px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 72% 50%, rgba(255,255,255,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .about-hero__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .about-hero__title {
+      font-size: 44px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+    .about-hero__sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.85;
+      max-width: 600px;
+      margin-bottom: 34px;
+    }
+    .about-hero__cta {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 26px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font);
+      background: #ffffff;
+      color: var(--purple);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .about-hero__cta:hover { transform: translateY(-2px); background: #f0e8f8; }
+
+    /* =============================================
+       신뢰 지표 띠배너
+    ============================================= */
+    .stat-bar { background: var(--purple); }
+    .stat-bar__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: stretch;
+    }
+    .stat-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      gap: 6px;
+    }
+    .stat-item__num {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stat-item__unit { font-size: 14px; font-weight: 700; margin-left: 2px; }
+    .stat-item__label { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 700; letter-spacing: 0.04em; }
+    .stat-divider { width: 1px; background: rgba(255,255,255,0.18); margin: 18px 0; }
+
+    /* =============================================
+       탭 패널
+    ============================================= */
+    .brand-panel { display: none; }
+    .brand-panel.is-active { display: block; }
+
+    /* =============================================
+       회사 소개 + 브랜드 카드
+    ============================================= */
+    .company-intro {
+      background: #ffffff;
+      padding: 72px 24px;
+      border-bottom: 1px solid var(--gray-mid);
+    }
+    .company-intro__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .company-intro__label {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 14px;
+    }
+    .company-intro__title {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--black);
+      line-height: 1.45;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+    .company-intro__body {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.9;
+    }
+    .brand-cards { display: flex; flex-direction: column; gap: 12px; }
+    .brand-card {
+      display: flex;
+      align-items: center;
+      background: var(--gray-light);
+      border: 1px solid var(--gray-mid);
+      border-radius: 10px;
+      padding: 20px 22px;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    .brand-card:hover {
+      background: var(--purple-light);
+      border-color: var(--purple);
+      transform: translateX(4px);
+    }
+    .brand-card__name { font-size: 15px; font-weight: 900; color: var(--black); min-width: 90px; }
+    .brand-card__desc { font-size: 13px; color: var(--gray-text); flex: 1; }
+    .brand-card__arrow { font-size: 16px; color: var(--purple); opacity: 0; transition: opacity 0.2s; }
+    .brand-card:hover .brand-card__arrow { opacity: 1; }
+
+    /* =============================================
+       서비스 섹션
+    ============================================= */
+    .svc-section { padding: 72px 24px; background: #ffffff; color: var(--black); }
+    .svc-section--alt { background: var(--gray-light); }
+    .svc-section__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .svc-section__inner--rev { direction: rtl; }
+    .svc-section__inner--rev > * { direction: ltr; }
+    .svc-section__brand { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; color: var(--purple); margin-bottom: 10px; }
+    .svc-section__title { font-size: 26px; font-weight: 900; line-height: 1.35; letter-spacing: -0.025em; margin-bottom: 14px; }
+    .svc-section__body { font-size: 14px; line-height: 1.85; color: #555; margin-bottom: 20px; }
+    .svc-section__list { margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+    .svc-section__list li { font-size: 13px; padding-left: 16px; position: relative; line-height: 1.55; color: var(--black); }
+    .svc-section__list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--purple); }
+    .svc-section__cta { display: inline-flex; align-items: center; font-size: 13px; font-weight: 700; color: var(--purple); }
+    .svc-section__cta:hover { text-decoration: underline; }
+    .svc-section__price-note { font-size: 12px; color: var(--gray-text); margin-bottom: 20px; padding: 8px 12px; background: var(--purple-light); border-radius: 6px; border-left: 3px solid var(--purple); }
+    .svc-visual { width: 100%; aspect-ratio: 4/3; background: var(--purple-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gray-text); font-size: 13px; border: 2px dashed var(--gray-mid); }
+    .svc-section--alt .svc-visual { background: #e8e0f0; }
+
+    /* =============================================
+       회사 약력 — 세로 타임라인
+    ============================================= */
+    .history-section {
+      background: var(--gray-light);
+      padding: 72px 24px;
+    }
+    .history-section__inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .history-section__title {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+    }
+    .history-timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+    .history-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 0;
+      width: 2px;
+      background: var(--gray-mid);
+    }
+    .history-year-group {
+      position: relative;
+      margin-bottom: 40px;
+    }
+    .history-year-group:last-child { margin-bottom: 0; }
+    .history-year-group__year {
+      position: relative;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--purple);
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .history-year-group__year::before {
+      content: '';
+      position: absolute;
+      left: -36px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--purple);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 2px var(--purple);
+    }
+    .history-year-group__list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history-year-group__list li {
+      font-size: 14px;
+      color: var(--black);
+      line-height: 1.6;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .history-month {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--purple);
+      background: var(--purple-light);
+      border-radius: 4px;
+      padding: 2px 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    @media (max-width: 768px) {
+      .history-section { padding: 52px 20px; }
+      .history-timeline { padding-left: 24px; }
+      .history-year-group__year::before { left: -28px; }
+    }
+
+    /* =============================================
+       문의 섹션
+    ============================================= */
+    .contact-section { background: var(--footer-bg); padding: 64px 24px; color: #ffffff; }
+    .contact-section__inner { max-width: 1200px; margin: 0 auto; }
+    .contact-info-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .contact-item { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 22px 18px; }
+    .contact-item__label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+    .contact-item__value { font-size: 14px; color: #ffffff; line-height: 1.65; }
+    .contact-item__value strong { font-size: 18px; font-weight: 900; }
+    .contact-item__note { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .contact-item__link { color: rgba(255,255,255,0.7); font-weight: 700; transition: color 0.2s; }
+    .contact-item__link:hover { color: #ffffff; }
+
+    /* =============================================
+       반응형
+    ============================================= */
+    @media (max-width: 900px) {
+      .company-intro__inner { grid-template-columns: 1fr; gap: 40px; }
+      .svc-section__inner { grid-template-columns: 1fr; gap: 32px; }
+      .svc-section__inner--rev { direction: ltr; }
+      .contact-info-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .about-hero { padding: 64px 20px 56px; }
+      .about-hero__title { font-size: 30px; }
+      .stat-bar__inner { flex-wrap: wrap; }
+      .stat-item { flex: 0 0 50%; }
+      .stat-divider { display: none; }
+      .svc-section { padding: 52px 20px; }
+      .svc-section__title { font-size: 22px; }
+      .contact-info-row { grid-template-columns: 1fr; }
+      .about-header__inner { height: auto; flex-direction: column; padding: 12px 16px 0; }
+      .about-header__brand { padding: 0 0 12px; font-size: 14px; }
+      .about-header__tabs { overflow-x: auto; scrollbar-width: none; }
+      .about-header__tabs::-webkit-scrollbar { display: none; }
+      .about-header__tab { padding: 10px 14px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="about-header">
+    <div class="about-header__inner">
+      <span class="about-header__brand">(주)엔엔터테인먼트</span>
+      <nav class="about-header__tabs">
+        <button class="about-header__tab is-active" data-tab="main">회사소개</button>
+        <button class="about-header__tab" data-tab="enticket">엔티켓</button>
+        <button class="about-header__tab" data-tab="ndesign">엔디자인</button>
+        <button class="about-header__tab" data-tab="nmedia">엔미디어</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- =============================================
+         탭 패널: 기업소개
+    ============================================= -->
+    <div class="brand-panel is-active" id="tab-main">
+
+      <section class="about-hero">
+        <div class="about-hero__inner">
+          <h1 class="about-hero__title">인천 공연문화의 중심,<br>기획부터 제작까지 함께합니다</h1>
+          <p class="about-hero__sub">엔티켓 티켓예매 플랫폼을 기반으로 공연기획·행사대행·디자인·영상제작까지,<br>인천 지역 공연·행사에 필요한 모든 것을 한 팀이 지원합니다.</p>
+          <a href="#contact" class="about-hero__cta">서비스 문의하기</a>
+        </div>
+      </section>
+
+      <section class="stat-bar">
+        <div class="stat-bar__inner">
+          <div class="stat-item">
+            <span class="stat-item__num">15<span class="stat-item__unit">만 명</span></span>
+            <span class="stat-item__label">누적 회원</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">16<span class="stat-item__unit">만 뷰</span></span>
+            <span class="stat-item__label">매월 페이지뷰</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">4<span class="stat-item__unit">만 명</span></span>
+            <span class="stat-item__label">매월 방문자</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">22<span class="stat-item__unit">년</span></span>
+            <span class="stat-item__label">서비스 운영</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="company-intro">
+        <div class="company-intro__inner">
+          <div class="company-intro__text">
+            <p class="company-intro__label">(주)엔엔터테인먼트</p>
+            <h2 class="company-intro__title">인천을 중심으로 공연·행사의<br>기획부터 제작까지 아우르는 종합 문화 기업입니다.</h2>
+            <p class="company-intro__body">2003년 설립 이후 인천 지역 공연·행사 시장과 함께 성장해 왔습니다. 티켓예매 플랫폼 엔티켓을 운영하며 지역 공연 문화의 기반을 다지고, 디자인 브랜드 엔디자인과 영상 브랜드 엔미디어를 통해 공연 홍보·제작 전반의 솔루션을 제공합니다. 기획사·주최자가 공연 하나에 필요한 모든 것을 한 팀에게 맡길 수 있도록 지원합니다.</p>
+          </div>
+          <div class="brand-cards">
+            <button class="brand-card" data-tab="enticket">
+              <p class="brand-card__name">엔티켓</p>
+              <p class="brand-card__desc">티켓예매 · 행사대행 · 공연기획</p>
+              <p class="brand-card__arrow">→</p>
+            </button>
+            <button class="brand-card" data-tab="ndesign">
+              <p class="brand-card__name">엔디자인</p>
+              <p class="brand-card__desc">디자인 · 홈페이지 제작</p>
+              <p class="brand-card__arrow">→</p>
+            </button>
+            <button class="brand-card" data-tab="nmedia">
+              <p class="brand-card__name">엔미디어</p>
+              <p class="brand-card__desc">영상제작 · 행사중계</p>
+              <p class="brand-card__arrow">→</p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 회사 약력 -->
+      <section class="history-section">
+        <div class="history-section__inner">
+          <h2 class="history-section__title">주요 약력</h2>
+          <div class="history-timeline">
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2018</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">07</span>캐나다 서크엘루아즈 '서커폴리스' 공동주최</li>
+                <li><span class="history-month">12</span>김창완 밴드 콘서트 '뭉클' 주관</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2019</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">12</span>김수희 콘서트 공동주최</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2020</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">06</span>마음더하기응원가 '인천열전' 연출</li>
+                <li><span class="history-month">08</span>두리+숙행 콘서트 연출</li>
+                <li><span class="history-month">11</span>2020 장애인인권영화제 연출</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2021</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">05</span>신미래·신선희 '더 신나는트롯' 연출</li>
+                <li><span class="history-month">06</span>2021 살롱콘서트 연출</li>
+                <li><span class="history-month">09</span>2021 시민문화콘서트 주관</li>
+                <li><span class="history-month">11</span>2021 장애인인권영화제 연출</li>
+                <li><span class="history-month">12</span>5.3합창단 정기공연 무대감독</li>
+                <li><span class="history-month">12</span>민주주의 영상 제작 연출</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2022</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">01</span>청천극장×프리스트 연출</li>
+                <li><span class="history-month">09</span>2022 시민희망대축제 주관</li>
+                <li><span class="history-month">11</span>가족뮤지컬 '무지개물고기' 주최</li>
+                <li><span class="history-month">12</span>민주주의 영상 제작 연출</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2023</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">04</span>옴니버스 콘서트 '세 가지 꿈' 연출</li>
+                <li><span class="history-month">06</span>김소현·손준호 클래식콘서트 주관</li>
+                <li><span class="history-month">06</span>2023 살롱콘서트 홍보</li>
+                <li><span class="history-month">07</span>청천1동 '문화와 낭만의 밤' 주관</li>
+                <li><span class="history-month">10</span>황금토끼 라틴댄스 연출</li>
+                <li><span class="history-month">12</span>바리톤 고성현 리사이틀 연출</li>
+                <li><span class="history-month">12</span>2023 송년제야 문화축제 주관</li>
+              </ul>
+            </div>
+
+            <div class="history-year-group">
+              <p class="history-year-group__year">2024</p>
+              <ul class="history-year-group__list">
+                <li><span class="history-month">03</span>2024 동인천 아트큐브 총괄 (~12월)</li>
+                <li><span class="history-month">09</span>2024 구월문화로 한마당 축제 총괄</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /#tab-main -->
+
+    <!-- =============================================
+         탭 패널: 엔티켓
+    ============================================= -->
+    <div class="brand-panel" id="tab-enticket">
+
+      <section class="about-hero">
+        <div class="about-hero__inner">
+          <h1 class="about-hero__title">티켓예매·행사대행·공연기획</h1>
+          <p class="about-hero__sub">인천 지역 공연·행사 전문 예매 플랫폼 엔티켓.<br>기획부터 현장 운영까지 공연의 모든 순간을 함께합니다.</p>
+          <a href="#contact" class="about-hero__cta">서비스 문의하기</a>
+        </div>
+      </section>
+
+      <section class="stat-bar">
+        <div class="stat-bar__inner">
+          <div class="stat-item">
+            <span class="stat-item__num">15<span class="stat-item__unit">만 명</span></span>
+            <span class="stat-item__label">누적 회원</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">16<span class="stat-item__unit">만 뷰</span></span>
+            <span class="stat-item__label">매월 페이지뷰</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">4<span class="stat-item__unit">만 명</span></span>
+            <span class="stat-item__label">매월 방문자</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">22<span class="stat-item__unit">년</span></span>
+            <span class="stat-item__label">서비스 운영</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="svc-section">
+        <div class="svc-section__inner">
+          <div>
+            <p class="svc-section__brand">엔티켓 — 티켓예매</p>
+            <h2 class="svc-section__title">인천 지역 공연에 특화된<br>티켓예매 플랫폼</h2>
+            <p class="svc-section__body">콘서트, 연극, 뮤지컬, 전시, 행사까지 인천 전 지역 공연장을 아우르는 예매 플랫폼입니다. 인터넷·모바일 예매부터 현장 발권까지 공연 기획사가 필요한 예매 인프라 전반을 지원합니다.</p>
+            <ul class="svc-section__list">
+              <li>온라인·모바일 예매 시스템</li>
+              <li>현장 발권 및 취소·환불 처리</li>
+              <li>기획사 전용 공연 등록·관리</li>
+              <li>회원 기반 마케팅 지원</li>
+            </ul>
+            <a href="/misc/commercial.html" class="svc-section__cta">기획사 등록 안내 →</a>
+          </div>
+          <div class="svc-visual">이미지 삽입 영역</div>
+        </div>
+      </section>
+
+      <section class="svc-section svc-section--alt">
+        <div class="svc-section__inner svc-section__inner--rev">
+          <div class="svc-visual">이미지 삽입 영역</div>
+          <div>
+            <p class="svc-section__brand">엔티켓 — 행사대행</p>
+            <h2 class="svc-section__title">수백 회 현장 경험으로<br>완성하는 행사 운영</h2>
+            <p class="svc-section__body">공연과 축제를 통해 쌓아온 실전 운영 노하우로 현장을 완성합니다. 규모와 성격에 맞는 맞춤형 컨트롤로 관객 동선, 무대 리듬, 행사 전체 흐름을 섬세하게 조율합니다.</p>
+            <ul class="svc-section__list">
+              <li>행사 기획 및 운영 총괄</li>
+              <li>현장 인력 구성·배치</li>
+              <li>무대·음향·조명 협력사 연계</li>
+            </ul>
+            <a href="#contact" class="svc-section__cta">행사대행 문의 →</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="svc-section">
+        <div class="svc-section__inner">
+          <div>
+            <p class="svc-section__brand">엔티켓 — 공연기획</p>
+            <h2 class="svc-section__title">콘서트·연극·뮤지컬<br>전 장르 공연기획</h2>
+            <p class="svc-section__body">공연의 시작과 끝을 가장 잘 아는 팀이 기획합니다. 다채로운 무대를 만들어온 기획력과 예술 현장에서 축적한 운영 노하우로 지역 문화의 무대를 만들어갑니다.</p>
+            <ul class="svc-section__list">
+              <li>공연 기획·캐스팅·제작 지원</li>
+              <li>콘서트·연극·뮤지컬·클래식 전 장르</li>
+              <li>인천문화예술회관 상주 운영 경험</li>
+            </ul>
+            <a href="#contact" class="svc-section__cta">공연기획 문의 →</a>
+          </div>
+          <div class="svc-visual">이미지 삽입 영역</div>
+        </div>
+      </section>
+
+    </div><!-- /#tab-enticket -->
+
+    <!-- =============================================
+         탭 패널: 엔디자인
+    ============================================= -->
+    <div class="brand-panel" id="tab-ndesign">
+
+      <section class="about-hero" style="background-image: url('endesign_hero.png'); background-size: cover; background-position: center 40%; position: relative;">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,10,46,0.75) 0%,rgba(96,43,137,0.55) 100%);"></div>
+        <div class="about-hero__inner" style="position:relative;z-index:1;">
+          <h1 class="about-hero__title">디자인·홈페이지 제작</h1>
+          <p class="about-hero__sub">공연 현장을 가장 잘 아는 팀이 만드는 디자인.<br>로고·포스터·현수막·배너·웹사이트까지 빠르고 합리적으로 전달합니다.</p>
+          <a href="#contact" class="about-hero__cta">디자인 문의하기</a>
+        </div>
+      </section>
+
+      <section class="stat-bar">
+        <div class="stat-bar__inner">
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">20<span class="stat-item__unit">년+</span></span>
+            <span class="stat-item__label">예술현장 경험</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="svc-section">
+        <div class="svc-section__inner">
+          <div>
+            <p class="svc-section__brand">엔디자인 — 디자인</p>
+            <h2 class="svc-section__title">로고·포스터·현수막·배너<br>디자인 서비스</h2>
+            <p class="svc-section__body">공연 현장을 가장 잘 아는 팀이 만드는 디자인입니다. 예술적 감각과 실전 노하우를 바탕으로 빠르고 합리적인 방식으로 결과물을 전달합니다.</p>
+            <ul class="svc-section__list">
+              <li>로고 · 명함 · 포스터 · 상세페이지</li>
+              <li>배너 · 현수막 · 인쇄물 전반</li>
+              <li>일반형 · 고급형 · 프리미엄형 3단계 가격</li>
+            </ul>
+            <p class="svc-section__price-note">가격 및 상세 옵션은 문의 시 안내드립니다.</p>
+            <a href="#contact" class="svc-section__cta">디자인 문의하기 →</a>
+          </div>
+          <div class="svc-visual">이미지 삽입 영역</div>
+        </div>
+      </section>
+
+      <section class="svc-section svc-section--alt">
+        <div class="svc-section__inner svc-section__inner--rev">
+          <div class="svc-visual">이미지 삽입 영역</div>
+          <div>
+            <p class="svc-section__brand">엔디자인 — 홈페이지 제작</p>
+            <h2 class="svc-section__title">공연·행사·아티스트 전용<br>홈페이지 제작</h2>
+            <p class="svc-section__body">공연과 예술을 이해하는 감각으로 만드는 웹사이트입니다. 브랜드 분위기와 메시지를 담아 단단한 첫인상을 만들어드립니다.</p>
+            <ul class="svc-section__list">
+              <li>공연·행사 전용 홍보 페이지</li>
+              <li>아티스트·단체 소개 사이트</li>
+              <li>기획사·공연장 홈페이지</li>
+            </ul>
+            <a href="#contact" class="svc-section__cta">홈페이지 제작 문의 →</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /#tab-ndesign -->
+
+    <!-- =============================================
+         탭 패널: 엔미디어
+    ============================================= -->
+    <div class="brand-panel" id="tab-nmedia">
+
+      <section class="about-hero">
+        <div class="about-hero__inner">
+          <h1 class="about-hero__title">영상제작·행사중계</h1>
+          <p class="about-hero__sub">무대 위의 감동을 영상으로 남기고 온라인으로 연결합니다.<br>홍보영상·기록영상·실시간 중계까지 한 팀이 담당합니다.</p>
+          <a href="#contact" class="about-hero__cta">영상 문의하기</a>
+        </div>
+      </section>
+
+      <section class="stat-bar">
+        <div class="stat-bar__inner">
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">예시</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="svc-section">
+        <div class="svc-section__inner">
+          <div>
+            <p class="svc-section__brand">엔미디어 — 영상제작</p>
+            <h2 class="svc-section__title">공연 기록영상·홍보영상·<br>티저 제작</h2>
+            <p class="svc-section__body">무대 위의 감동과 현장의 분위기를 영상으로 남깁니다. 공연 홍보용 티저부터 행사 기록영상까지 목적에 맞는 영상을 제작합니다.</p>
+            <ul class="svc-section__list">
+              <li>공연·행사 기록영상</li>
+              <li>홍보·티저 영상</li>
+              <li>SNS용 숏폼 콘텐츠</li>
+            </ul>
+            <a href="#contact" class="svc-section__cta">영상 문의하기 →</a>
+          </div>
+          <div class="svc-visual">이미지 삽입 영역</div>
+        </div>
+      </section>
+
+      <section class="svc-section svc-section--alt">
+        <div class="svc-section__inner svc-section__inner--rev">
+          <div class="svc-visual">이미지 삽입 영역</div>
+          <div>
+            <p class="svc-section__brand">엔미디어 — 행사중계</p>
+            <h2 class="svc-section__title">공연·행사 실시간<br>온라인 중계</h2>
+            <p class="svc-section__body">현장에 오지 못한 관객에게도 공연의 감동을 전달합니다. 안정적인 스트리밍 환경과 현장 중계 노하우로 온라인 관객과 공연을 연결합니다.</p>
+            <ul class="svc-section__list">
+              <li>유튜브·네이버TV 등 플랫폼 중계</li>
+              <li>멀티캠 현장 중계</li>
+              <li>VOD 편집·납품</li>
+            </ul>
+            <a href="#contact" class="svc-section__cta">중계 문의하기 →</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /#tab-nmedia -->
+
+    <!-- =============================================
+         문의·연락처
+    ============================================= -->
+    <section class="contact-section" id="contact">
+      <div class="contact-section__inner">
+        <div class="contact-info-row">
+          <div class="contact-item">
+            <p class="contact-item__label">상담 및 문의</p>
+            <p class="contact-item__value"><strong>1588-2341</strong></p>
+          </div>
+          <div class="contact-item">
+            <p class="contact-item__label">팩스</p>
+            <p class="contact-item__value">032-818-5727</p>
+          </div>
+          <div class="contact-item">
+            <p class="contact-item__label">주소</p>
+            <p class="contact-item__value">인천광역시 남동구 문화서로4번길 66, 지하1층</p>
+          </div>
+        </div>
+        <div id="naverMap" style="width:100%;height:360px;border-radius:10px;margin-top:28px;overflow:hidden;"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__links">
+      <div class="footer__links-inner">
+        <a href="/misc/ceo_message.html" class="footer__link">회사소개</a>
+        <a href="/misc/policy.html"      class="footer__link">개인정보보호정책</a>
+        <a href="/misc/user_agree.html"  class="footer__link">이용약관</a>
+        <a href="/misc/commercial.html"  class="footer__link">기획사 예매처 등록안내</a>
+        <a href="/misc/sitemap.html"     class="footer__link">사이트맵</a>
+      </div>
+    </div>
+    <div class="footer__info">
+      <div class="footer__logo">
+        <img src="logo_gray.png" alt="엔티켓" style="height:80px;width:auto;">
+      </div>
+      <div class="footer__text">
+        <strong>(주)엔엔터테인먼트</strong> ㅣ 대표 : 박동현 ㅣ
+        인천광역시 남동구 문화서로4번길 66, 지하1층<br>
+        상담 및 문의 : <strong>1588-2341</strong> ㅣ
+        팩스 : 032-818-5727 ㅣ
+        사업자등록번호 : 131-81-83599<br>
+        통신판매업신고 : 제2017-인천부평-1080호 ㅣ
+        Copyright ⓒ <strong>엔티켓</strong>. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── 브랜드 탭 전환 ── */
+    (function () {
+      var panels  = document.querySelectorAll('.brand-panel');
+      var navTabs = document.querySelectorAll('.about-header__tab');
+
+      function activate(tabId) {
+        panels.forEach(function (p) {
+          p.classList.toggle('is-active', p.id === 'tab-' + tabId);
+        });
+        navTabs.forEach(function (t) {
+          t.classList.toggle('is-active', t.dataset.tab === tabId);
+        });
+        if (tabId !== 'main') {
+          history.replaceState(null, '', '#' + tabId);
+        } else {
+          history.replaceState(null, '', location.pathname);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      navTabs.forEach(function (t) {
+        t.addEventListener('click', function () { activate(t.dataset.tab); });
+      });
+
+      document.querySelectorAll('.brand-card').forEach(function (card) {
+        card.addEventListener('click', function () { activate(card.dataset.tab); });
+      });
+
+      var hash = location.hash.replace('#', '');
+      if (hash && document.getElementById('tab-' + hash)) {
+        activate(hash);
+      }
+    })();
+  </script>
+
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=sr3c3r0mbt"></script>
+  <script>
+    /* ── 네이버 지도 ── */
+    (function () {
+      var mapDiv = document.getElementById('naverMap');
+      if (!mapDiv || typeof naver === 'undefined') return;
+      var location = new naver.maps.LatLng(37.4487, 126.7314);
+      var map = new naver.maps.Map(mapDiv, {
+        center: location,
+        zoom: 16
+      });
+      new naver.maps.Marker({
+        position: location,
+        map: map,
+        title: '(주)엔엔터테인먼트'
+      });
+    })();
+  </script>
+
+</body>
+</html>

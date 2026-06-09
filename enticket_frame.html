@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>엔티켓 - 인천 공연문화 티켓 예매</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Square:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+
+    /* =============================================
+       CSS 변수
+    ============================================= */
+    :root {
+      --purple:       #602b89;
+      --purple-dark:  #4a1f6a;
+      --purple-light: #f3edf9;
+      --white:        #ffffff;
+      --gray-light:   #f4f4f6;
+      --gray-mid:     #e1e1e1;
+      --gray-text:    #929294;
+      --black:        #2c2c2c;
+      --footer-bg:    #2f2f2f;
+      --font:         'Nanum Square', '나눔스퀘어', sans-serif;
+
+      /* 리퀴드 글래스 — 예비 토큰(현재 미사용). 실제 글래스 요소는
+         개별 rgba 값을 사용하므로, 통일하려면 각 요소를 var()로 교체할 것 */
+      --glass-bg:     rgba(255, 255, 255, 0.15);
+      --glass-blur:   blur(20px);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* =============================================
+       리셋
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body { font-family: var(--font); color: var(--white); background: var(--white); }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    ul, ol { list-style: none; }
+
+    /* =============================================
+       전체 래퍼
+    ============================================= */
+    .site-wrap {
+      position: relative;
+    }
+
+    /* 헤더+GNB — 상단에 고정 위치 (sticky 아님) */
+    .floating-nav {
+      position: relative;
+      z-index: 100;
+      background-color: #1a0a2e;
+    }
+    /* 배경 이미지 크로스페이드 레이어 2개 */
+    .floating-nav__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center top;
+      opacity: 1;
+      transition: opacity 0.9s ease;
+    }
+    .floating-nav__bg.layer-a { z-index: 0; }
+    .floating-nav__bg.layer-b { z-index: 1; opacity: 0; }
+    /* 헤더/GNB 내부 콘텐츠는 배경 위에 */
+    .header, .gnb {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* =============================================
+       추적 헤더 (스크롤 시 등장 — 헤더만, 투명 글래스)
+    ============================================= */
+    .sticky-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    .sticky-nav.is-visible {
+      transform: translateY(0);
+    }
+    .sticky-nav__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .sticky-nav__logo { flex-shrink: 0; }
+    .sticky-nav__logo img {
+      height: 68px;
+      width: auto;
+    }
+    .sticky-nav__search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+    .sticky-nav__search input {
+      width: 100%;
+      height: 38px;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.3);
+      border-radius: 999px;
+      padding: 0 44px 0 16px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: #000000;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .sticky-nav__search input::placeholder { color: rgba(0,0,0,0.5); }
+    .sticky-nav__search input:focus {
+      background: rgba(0,0,0,0.08);
+      border-color: rgba(0,0,0,0.5);
+    }
+    .sticky-nav__search-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #000000;
+      display: flex;
+      align-items: center;
+    }
+    .sticky-nav__search-btn svg {
+      width: 17px; height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+    .sticky-nav__utils {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .sticky-nav__util-link {
+      font-size: 12px;
+      color: #000000;
+      padding: 0 8px;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .sticky-nav__util-link:hover { color: var(--purple); }
+    .sticky-nav__util-divider {
+      font-size: 11px;
+      color: rgba(0,0,0,0.3);
+    }
+    /* 추적 헤더 모바일용 검색 아이콘 (데스크탑 숨김 / 밝은 글래스 위라 다크) */
+    .sticky-nav__search-icon {
+      display: none;
+      align-items: center;
+      margin-left: auto;
+      color: rgba(0,0,0,0.7);
+    }
+    .sticky-nav__search-icon svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    /* =============================================
+       최상단 이동 버튼 (투명 리퀴드 글래스)
+    ============================================= */
+    .top-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 300;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+      pointer-events: none;
+    }
+    .top-btn.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .top-btn:hover { background: rgba(255,255,255,0.28); }
+    .top-btn svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: rgba(0,0,0,0.7);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* =============================================
+       헤더 (리퀴드 글래스)
+       - 로고 (좌측)
+       - 검색창 (중앙)
+       - 로그인/회원가입/예매확인 (우측)
+    ============================================= */
+    .header {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .header__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* 로고 */
+    .logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .logo__img {
+      height: 68px;
+      width: auto;
+      mix-blend-mode: screen;
+    }
+
+    /* 검색창 */
+    .search {
+      flex: 1;
+      max-width: 420px;
+      position: relative;
+    }
+    .search__input {
+      width: 100%;
+      height: 38px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 999px;
+      padding: 0 44px 0 16px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: #ffffff;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .search__input::placeholder { color: rgba(255,255,255,0.65) !important; }
+    .search__input::-webkit-input-placeholder { color: rgba(255,255,255,0.65); }
+    .search__input::-moz-placeholder { color: rgba(255,255,255,0.65); }
+    .search__input:focus {
+      background: rgba(255,255,255,0.28);
+      border-color: rgba(255,255,255,0.7);
+    }
+    .search__btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      transition: color 0.2s;
+    }
+    .search__btn svg {
+      width: 17px; height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    /* 우측 유틸 링크 */
+    .header__utils {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .header__util-link {
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      padding: 0 8px;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .header__util-link:hover { color: var(--white); }
+    .header__util-divider {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* =============================================
+       GNB (리퀴드 글래스)
+    ============================================= */
+    .gnb {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .gnb__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .gnb__inner::-webkit-scrollbar { display: none; }
+    .gnb__item {
+      flex-shrink: 0;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .gnb__item:hover {
+      color: var(--white);
+      border-bottom-color: rgba(255,255,255,0.7);
+    }
+    .gnb__item.active {
+      color: var(--white);
+      border-bottom-color: var(--white);
+      font-weight: 900;
+    }
+
+    /* =============================================
+       히어로 배너 (슬라이더)
+       헤더+GNB가 위에 떠있음
+    ============================================= */
+    .hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 2000 / 460;
+      overflow: hidden;
+      background: #1a0a2e;
+    }
+    .hero__slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+    .hero__slide.active { opacity: 1; }
+    .hero__slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .hero__slide picture {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .hero__slide picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* 슬라이드 위 그라디언트 */
+    .hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(20,5,40,0.6) 0%,
+        rgba(20,5,40,0.2) 60%,
+        transparent 100%
+      );
+    }
+    /* 슬라이드 텍스트 (현재 마크업 미사용 — 배너에 캡션 추가 시 사용) */
+    .hero__content {
+      position: absolute;
+      bottom: 80px;
+      left: 5%;
+      max-width: 500px;
+    }
+    .hero__label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .hero__title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    }
+    .hero__date {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 20px;
+    }
+    .hero__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      background: var(--purple);
+      color: var(--white);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .hero__btn:hover {
+      background: var(--purple-dark);
+      transform: translateY(-1px);
+    }
+    /* 슬라이더 도트 */
+    .hero__dots {
+      position: absolute;
+      bottom: 28px;
+      left: 5%;
+      display: flex;
+      gap: 6px;
+    }
+    .hero__dot {
+      width: 28px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    .hero__dot.active {
+      width: 44px;
+      background: var(--white);
+    }
+    /* 슬라이더 화살표 */
+    .hero__arrows {
+      position: absolute;
+      bottom: 20px;
+      right: 24px;
+      display: flex;
+      gap: 8px;
+    }
+    .hero__arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .hero__arrow:hover { background: rgba(255,255,255,0.3); }
+
+    /* =============================================
+       컨텐츠 영역
+    ============================================= */
+    .page-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      color: var(--black);
+    }
+
+    /* 섹션 헤더 */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -0.03em;
+    }
+    .section-accent { color: var(--purple); }
+    .section-more {
+      font-size: 13px;
+      color: var(--gray-text);
+      transition: color 0.2s;
+    }
+    .section-more:hover { color: var(--purple); }
+
+    /* 공연 카드 그리드 — 4열 */
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .perf-card {
+      display: block;
+      color: var(--black);
+      transition: transform 0.2s;
+    }
+    .perf-card:hover { transform: translateY(-4px); }
+    .perf-card__poster {
+      width: 100%;
+      aspect-ratio: 238 / 331;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--purple-light);
+      margin-bottom: 10px;
+    }
+    .perf-card__poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .perf-card:hover .perf-card__poster img { transform: scale(1.04); }
+    .perf-card__info { padding: 0 2px; }
+    .perf-card__title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .perf-card__venue {
+      font-size: 12px;
+      color: var(--gray-text);
+      margin-bottom: 3px;
+    }
+    .perf-card__date {
+      font-size: 12px;
+      color: var(--gray-text);
+    }
+
+    /* 반응형 */
+    @media (max-width: 1024px) {
+      .perf-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .perf-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .section-title { font-size: 16px; }
+    }
+
+    /* =============================================
+       푸터
+    ============================================= */
+    .footer {
+      width: 100%;
+      background: var(--footer-bg);
+      color: var(--white);
+    }
+    .footer__links {
+      border-bottom: 1px solid #424242;
+    }
+    .footer__links-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .footer__link {
+      font-size: 13px;
+      color: #9f9fa1;
+      padding: 0 14px;
+      border-right: 1px solid #424242;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .footer__link:first-child { padding-left: 0; }
+    .footer__link:last-child { border-right: none; }
+    .footer__link:hover { color: var(--white); }
+    .footer__info {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+    }
+    .footer__logo img {
+      height: 36px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.7;
+    }
+    .footer__text {
+      font-size: 12px;
+      color: #d5d5d5;
+      line-height: 2;
+    }
+    .footer__text strong { color: var(--white); }
+
+    /* =============================================
+       반응형
+    ============================================= */
+    @media (max-width: 768px) {
+      .hero { aspect-ratio: 720 / 430; }
+      .hero__title { font-size: 22px; }
+      .hero__content { bottom: 60px; }
+
+      .header__inner { height: 56px; padding: 0 16px; }
+      .logo__img { height: 56px; }   /* 모바일 헤더 바 높이(56px)에 맞춤 */
+      .search { display: none; }
+      .header__search-icon {        /* display 는 아래 base/미디어쿼리에서 일괄 제어 */
+        color: var(--white);
+        margin-left: auto;
+      }
+      .header__utils { margin-left: 8px; }
+      .header__util-link { font-size: 11px; padding: 0 5px; }
+
+      /* 추적 헤더 — 모바일에서 헤더와 동일 구성 (검색은 아이콘으로 축약) */
+      .sticky-nav__inner { height: 56px; padding: 0 16px; }
+      .sticky-nav__logo img { height: 56px; }
+      .sticky-nav__search { display: none; }
+      .sticky-nav__search-icon { display: flex; }
+      .sticky-nav__utils { margin-left: 8px; }
+      .sticky-nav__util-link { font-size: 11px; padding: 0 5px; }
+
+      .gnb__item { padding: 0 10px; font-size: 12px; height: 40px; }
+
+      .footer__info { flex-direction: column; gap: 16px; }
+      .footer__links-inner { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 4px; }
+    }
+    .header__search-icon { display: none; }
+    @media (max-width: 768px) {
+      .header__search-icon { display: flex; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 히어로 위에 헤더+GNB가 떠있는 구조 -->
+  <div class="site-wrap">
+
+    <!-- =============================================
+         떠있는 내비게이션 (헤더 + GNB)
+    ============================================= -->
+    <div class="floating-nav" id="floatingNav">
+      <!-- 배경 크로스페이드 레이어 2개 -->
+      <div class="floating-nav__bg layer-a" id="navBgA"></div>
+      <div class="floating-nav__bg layer-b" id="navBgB"></div>
+
+      <!-- 헤더 -->
+      <header class="header">
+        <div class="header__inner">
+
+          <!-- 좌측: 로고 -->
+          <a href="/" class="logo">
+            <img src="logo_white.png" alt="엔티켓" class="logo__img">
+          </a>
+
+          <!-- 중앙: 검색창 -->
+          <div class="search">
+            <input
+              type="text"
+              class="search__input"
+              placeholder="공연명, 아티스트, 장소 검색"
+              maxlength="30"
+              id="searchInput"
+            >
+            <button class="search__btn" id="searchBtn" aria-label="검색">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 우측: 유틸 링크 -->
+          <div class="header__utils">
+            <a href="/mem/member_login.html"  class="header__util-link">로그인</a>
+            <span class="header__util-divider">|</span>
+            <a href="/mem/member_agree.html"  class="header__util-link">회원가입</a>
+            <span class="header__util-divider">|</span>
+            <a href="/pfm/reserve_exp.html"   class="header__util-link">예매확인/취소</a>
+          </div>
+
+          <!-- 모바일 검색 아이콘 -->
+          <a href="#" class="header__search-icon" aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/>
+              <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+            </svg>
+          </a>
+
+        </div>
+      </header>
+
+      <!-- GNB -->
+      <nav class="gnb">
+        <div class="gnb__inner">
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=musical"  class="gnb__item active">뮤지컬/오페라</a>
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=play"     class="gnb__item">연극</a>
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=concert"  class="gnb__item">콘서트</a>
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=classic"  class="gnb__item">클래식/국악/무용</a>
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=child"    class="gnb__item">아동/가족</a>
+          <a href="/pfm/sub01.html?pfmIng=1&p_cate=exhibit"  class="gnb__item">행사/전시</a>
+          <a href="/pfm/show_calendar.html"                  class="gnb__item">공연캘린더</a>
+          <a href="/bd/list.html?b_code=qna"                 class="gnb__item">고객센터</a>
+        </div>
+      </nav>
+
+    </div><!-- /floating-nav -->
+
+    <!-- =============================================
+         히어로 배너 (슬라이더)
+    ============================================= -->
+    <section class="hero" id="hero">
+
+      <!-- 슬라이드 1 -->
+      <div class="hero__slide active">
+        <picture>
+          <source media="(max-width: 768px)" srcset="banner_1_m.jpg">
+          <img src="banner_1.jpg" alt="포레스텔라"
+               onerror="this.style.background='linear-gradient(135deg,#602b89,#2d0a5a)';this.style.display='block'">
+        </picture>
+        <div class="hero__overlay"></div>
+      </div>
+
+      <!-- 슬라이드 2 -->
+      <div class="hero__slide">
+        <picture>
+          <source media="(max-width: 768px)" srcset="banner_2_m.jpg">
+          <img src="banner_2.jpg" alt="청라 브런치 콘서트"
+               onerror="this.style.background='linear-gradient(135deg,#1a4a8a,#0a2a5a)';this.style.display='block'">
+        </picture>
+        <div class="hero__overlay"></div>
+      </div>
+
+      <!-- 슬라이드 3 -->
+      <div class="hero__slide">
+        <picture>
+          <source media="(max-width: 768px)" srcset="banner_3_m.jpg">
+          <img src="banner_3.jpg" alt="판뮤지컬"
+               onerror="this.style.background='linear-gradient(135deg,#8a1a4a,#5a0a2a)';this.style.display='block'">
+        </picture>
+        <div class="hero__overlay"></div>
+      </div>
+
+      <!-- 도트 -->
+      <div class="hero__dots" id="heroDots">
+        <button class="hero__dot active" data-idx="0"></button>
+        <button class="hero__dot" data-idx="1"></button>
+        <button class="hero__dot" data-idx="2"></button>
+      </div>
+
+      <!-- 화살표 -->
+      <div class="hero__arrows">
+        <button class="hero__arrow" id="heroPrev">‹</button>
+        <button class="hero__arrow" id="heroNext">›</button>
+      </div>
+
+    </section><!-- /hero -->
+
+  </div><!-- /site-wrap -->
+
+  <!-- =============================================
+       추적 헤더 (헤더+GNB 벗어나면 등장 — 헤더만)
+  ============================================= -->
+  <div class="sticky-nav" id="stickyNav">
+    <div class="sticky-nav__inner">
+      <!-- 로고 -->
+      <a href="/" class="sticky-nav__logo">
+        <img src="logo.png" alt="엔티켓">
+      </a>
+      <!-- 검색창 -->
+      <div class="sticky-nav__search">
+        <input type="text" id="stickySearchInput" placeholder="공연명, 아티스트, 장소 검색" maxlength="30">
+        <button class="sticky-nav__search-btn" id="stickySearchBtn" aria-label="검색">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </button>
+      </div>
+      <!-- 유틸 링크 -->
+      <div class="sticky-nav__utils">
+        <a href="/mem/member_login.html" class="sticky-nav__util-link">로그인</a>
+        <span class="sticky-nav__util-divider">|</span>
+        <a href="/mem/member_agree.html" class="sticky-nav__util-link">회원가입</a>
+        <span class="sticky-nav__util-divider">|</span>
+        <a href="/pfm/reserve_exp.html"  class="sticky-nav__util-link">예매확인/취소</a>
+      </div>
+      <!-- 모바일 검색 아이콘 (헤더와 동일 구성) -->
+      <a href="#" class="sticky-nav__search-icon" aria-label="검색">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- 최상단 이동 버튼 -->
+  <button class="top-btn" id="topBtn" aria-label="최상단으로">
+    <svg viewBox="0 0 24 24">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </button>
+  <main class="page-wrap">
+
+    <!-- 섹션 헤더 -->
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-accent">엔티켓</span> 추천공연/행사/전시</h2>
+      <a href="/pfm/sub01.html?pfmIng=1" class="section-more">전체보기 →</a>
+    </div>
+
+    <!-- 공연 카드 그리드 -->
+    <div class="perf-grid">
+
+      <a href="/pfm/sub01_view.html?p_idx=4250" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="포레스텔라" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">포레스텔라 정규4집 투어 콘서트 THE LEGACY : SYMPHONY</p>
+          <p class="perf-card__venue">송도컨벤시아</p>
+          <p class="perf-card__date">26.06.06 ~ 26.06.07</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4234" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="청라 브런치 콘서트" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">청라 브런치 콘서트</p>
+          <p class="perf-card__venue">청라블루노바홀</p>
+          <p class="perf-card__date">26.05.27 ~ 26.10.21</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4224" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="소월" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">시(詩)네마 오페라 ＜소월＞</p>
+          <p class="perf-card__venue">문학시어터</p>
+          <p class="perf-card__date">26.05.29 ~ 26.05.30</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4217" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="오버코트" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">매직스크린 가족극 ＜오버코트＞</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.05.30</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4235" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="할머니 엄마" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">할머니 엄마</p>
+          <p class="perf-card__venue">문화공간 터틀</p>
+          <p class="perf-card__date">26.05.30</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4238" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="인천무용제" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">제35회 인천무용제</p>
+          <p class="perf-card__venue">부평아트센터</p>
+          <p class="perf-card__date">26.06.05 ~ 26.06.06</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4242" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="펜타포트" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">2026 인천펜타포트 락 페스티벌 with KB</p>
+          <p class="perf-card__venue">송도달빛축제공원</p>
+          <p class="perf-card__date">26.07.31 ~ 26.08.02</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4255" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="인천YMCA 오케스트라" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">제9회 인천YMCA 오케스트라 정기연주회</p>
+          <p class="perf-card__venue">아트센터인천</p>
+          <p class="perf-card__date">26.07.04</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4201" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연9" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천시립합창단 제196회 정기연주회</p>
+          <p class="perf-card__venue">아트센터인천</p>
+          <p class="perf-card__date">26.06.26</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4202" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연10" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">Sound Of Cinema (사운드 오브 시네마)</p>
+          <p class="perf-card__venue">인천수봉문화회관</p>
+          <p class="perf-card__date">26.06.27</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4203" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연11" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">클래식시리즈 산책 II – 김홍박 & 아레테 콰르텟</p>
+          <p class="perf-card__venue">제물포구문화체육센터</p>
+          <p class="perf-card__date">26.06.27</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4204" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연12" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천시립교향악단 기획음악회 실내악 콘서트 II</p>
+          <p class="perf-card__venue">인천문화예술회관</p>
+          <p class="perf-card__date">26.07.03</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4205" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연13" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">트라이보울 시리즈 – BONANZA (보난자)</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.06.24</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4206" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연14" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">트라이보울 시리즈 – 사색하는 악기, 사유하는 음악</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.06.24 ~ 26.07.29</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4207" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연15" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">2026 학산가족음악회 세종의 날개</p>
+          <p class="perf-card__venue">학산소극장</p>
+          <p class="perf-card__date">26.06.24</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4208" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연16" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">카스타냐 탱고 ＜탱고 키스＞</p>
+          <p class="perf-card__venue">남동소라아트홀</p>
+          <p class="perf-card__date">26.06.24</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4209" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연17" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">트라이보울 도시예술 산책</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.06.06 ~ 26.08.09</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4210" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연18" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">한국근대동요열전</p>
+          <p class="perf-card__venue">한중문화회관</p>
+          <p class="perf-card__date">26.06.06</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4211" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연19" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">판뮤지컬 이상한 나라의 숨바꼭질</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.06.13</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4212" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연20" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">이상한 나라의 숨바꼭질 – 가족 뮤지컬</p>
+          <p class="perf-card__venue">트라이보울</p>
+          <p class="perf-card__date">26.06.13</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4213" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연21" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천수봉문화회관 기획공연</p>
+          <p class="perf-card__venue">인천수봉문화회관</p>
+          <p class="perf-card__date">26.06.20</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4214" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연22" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">청라 블루노바홀 여름 특별공연</p>
+          <p class="perf-card__venue">청라블루노바홀</p>
+          <p class="perf-card__date">26.07.10 ~ 26.07.12</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4215" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연23" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천문화예술회관 여름 기획공연</p>
+          <p class="perf-card__venue">인천문화예술회관</p>
+          <p class="perf-card__date">26.07.15 ~ 26.07.16</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4216" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연24" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">부평아트센터 여름 시즌 공연</p>
+          <p class="perf-card__venue">부평아트센터</p>
+          <p class="perf-card__date">26.07.18 ~ 26.07.19</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4220" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연25" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천국제음악제 2026</p>
+          <p class="perf-card__venue">아트센터인천</p>
+          <p class="perf-card__date">26.08.01 ~ 26.08.03</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4221" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연26" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">남동소라아트홀 기획 콘서트</p>
+          <p class="perf-card__venue">남동소라아트홀</p>
+          <p class="perf-card__date">26.08.05</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4222" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연27" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">학산문화원 하반기 기획공연</p>
+          <p class="perf-card__venue">학산소극장</p>
+          <p class="perf-card__date">26.08.08 ~ 26.08.09</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4223" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연28" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천서구문화회관 여름 특별공연</p>
+          <p class="perf-card__venue">인천서구문화회관</p>
+          <p class="perf-card__date">26.08.12</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4225" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연29" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">2026 인천 재즈 페스티벌</p>
+          <p class="perf-card__venue">송도달빛축제공원</p>
+          <p class="perf-card__date">26.08.15 ~ 26.08.16</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4226" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연30" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">제물포구문화체육센터 가을 기획공연</p>
+          <p class="perf-card__venue">제물포구문화체육센터</p>
+          <p class="perf-card__date">26.09.05</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4227" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연31" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천시립무용단 정기공연</p>
+          <p class="perf-card__venue">인천문화예술회관</p>
+          <p class="perf-card__date">26.09.12</p>
+        </div>
+      </a>
+
+      <a href="/pfm/sub01_view.html?p_idx=4228" class="perf-card">
+        <div class="perf-card__poster"><img src="poster_1.jpg" alt="공연32" onerror="this.parentElement.style.background='#f0ecf9'"></div>
+        <div class="perf-card__info">
+          <p class="perf-card__title">인천시립극단 하반기 정기공연</p>
+          <p class="perf-card__venue">인천문화예술회관</p>
+          <p class="perf-card__date">26.09.19 ~ 26.09.20</p>
+        </div>
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- =============================================
+       푸터
+  ============================================= -->
+  <footer class="footer">
+    <div class="footer__links">
+      <div class="footer__links-inner">
+        <a href="/misc/ceo_message.html" class="footer__link">회사소개</a>
+        <a href="/misc/policy.html"      class="footer__link">개인정보보호정책</a>
+        <a href="/misc/user_agree.html"  class="footer__link">이용약관</a>
+        <a href="/misc/commercial.html"  class="footer__link">기획사 예매처 등록안내</a>
+        <a href="/misc/sitemap.html"     class="footer__link">사이트맵</a>
+      </div>
+    </div>
+    <div class="footer__info">
+      <div class="footer__logo">
+        <img src="logo_gray.png" alt="엔티켓" style="height:80px;width:auto;">
+      </div>
+      <div class="footer__text">
+        <strong>(주)엔엔터테인먼트</strong> ㅣ 대표 : 박동현 ㅣ
+        인천광역시 남동구 문화서로4번길 66, 지하1층<br>
+        상담 및 문의 : <strong>1588-2341</strong> ㅣ
+        팩스 : 032-818-5727 ㅣ
+        사업자등록번호 : 131-81-83599<br>
+        통신판매업신고 : 제2017-인천부평-1080호 ㅣ
+        Copyright ⓒ <strong>엔티켓</strong>. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- =============================================
+       JS
+  ============================================= -->
+  <script>
+    /* ── 히어로 슬라이더 ── */
+    (function () {
+      var slides  = document.querySelectorAll('.hero__slide');
+      var dots    = document.querySelectorAll('.hero__dot');
+      var layerA  = document.getElementById('navBgA');
+      var layerB  = document.getElementById('navBgB');
+      var banners = ['banner_1.jpg', 'banner_2.jpg', 'banner_3.jpg'];
+      var cur = 0, timer;
+      var useA = true; // 현재 앞에 보이는 레이어 추적
+
+      function go(idx) {
+        var next = (idx + slides.length) % slides.length;
+        // 슬라이드 + 헤더 배경 동시 전환
+        slides[cur].classList.remove('active');
+        dots[cur].classList.remove('active');
+        if (useA) {
+          layerB.style.backgroundImage = "url('" + banners[next] + "')";
+          layerB.style.zIndex = '1';
+          layerB.style.opacity = '1';
+          layerA.style.opacity = '0';
+          layerA.style.zIndex = '0';
+        } else {
+          layerA.style.backgroundImage = "url('" + banners[next] + "')";
+          layerA.style.zIndex = '1';
+          layerA.style.opacity = '1';
+          layerB.style.opacity = '0';
+          layerB.style.zIndex = '0';
+        }
+        useA = !useA;
+        cur = next;
+        slides[cur].classList.add('active');
+        dots[cur].classList.add('active');
+      }
+
+      // 초기 배경 설정
+      layerA.style.backgroundImage = "url('" + banners[0] + "')";
+      layerA.style.opacity = '1';
+
+      function autoPlay() { timer = setInterval(function(){ go(cur + 1); }, 5000); }
+
+      dots.forEach(function(d) {
+        d.addEventListener('click', function() {
+          clearInterval(timer); go(+d.dataset.idx); autoPlay();
+        });
+      });
+      document.getElementById('heroPrev').addEventListener('click', function() {
+        clearInterval(timer); go(cur - 1); autoPlay();
+      });
+      document.getElementById('heroNext').addEventListener('click', function() {
+        clearInterval(timer); go(cur + 1); autoPlay();
+      });
+      autoPlay();
+    })();
+
+    /* ── 스크롤 헤더 + top 버튼 ── */
+    (function () {
+      var floatingNav = document.getElementById('floatingNav');
+      var stickyNav   = document.getElementById('stickyNav');
+      var topBtn      = document.getElementById('topBtn');
+
+      window.addEventListener('scroll', function () {
+        var navBottom = floatingNav.getBoundingClientRect().bottom;
+
+        // 헤더+GNB 영역 벗어나면 스크롤 헤더 등장
+        if (navBottom <= 0) {
+          stickyNav.classList.add('is-visible');
+        } else {
+          stickyNav.classList.remove('is-visible');
+        }
+
+        // 300px 이상 스크롤하면 top 버튼 등장
+        if (window.scrollY > 300) {
+          topBtn.classList.add('is-visible');
+        } else {
+          topBtn.classList.remove('is-visible');
+        }
+      });
+
+      // 최상단 이동
+      topBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    })();
+
+    /* ── GNB 현재 페이지 active ──
+       카테고리 메뉴는 경로(/pfm/sub01.html)가 같아 p_cate 값까지 비교해야
+       해당 메뉴 1개만 활성화됨. 일반 메뉴는 경로만 비교. ── */
+    (function () {
+      var loc      = window.location;
+      var curCate  = new URLSearchParams(loc.search).get('p_cate');
+      document.querySelectorAll('.gnb__item').forEach(function (item) {
+        item.classList.remove('active');
+        var href     = item.getAttribute('href');
+        var qIdx     = href.indexOf('?');
+        var itemPath = qIdx === -1 ? href : href.slice(0, qIdx);
+        var itemCate = qIdx === -1 ? null
+                     : new URLSearchParams(href.slice(qIdx + 1)).get('p_cate');
+        var pathHit  = loc.pathname.indexOf(itemPath) !== -1;
+        var match    = itemCate ? (pathHit && curCate === itemCate) : pathHit;
+        if (match) item.classList.add('active');
+      });
+    })();
+
+    /* ── 검색 (헤더 + 추적 헤더 공통) ── */
+    (function () {
+      function runSearch(input) {
+        var keyword = input.value.trim();
+        if (!keyword) { alert('검색어를 입력해주세요.'); input.focus(); return; }
+        location.href = '/pfm/show_calendar.html?s_keyword=' + encodeURIComponent(keyword);
+      }
+      function bind(inputId, btnId) {
+        var input = document.getElementById(inputId);
+        var btn   = document.getElementById(btnId);
+        if (btn)   btn.addEventListener('click', function () { runSearch(input); });
+        if (input) input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') runSearch(input);
+        });
+      }
+      bind('searchInput', 'searchBtn');             // 헤더
+      bind('stickySearchInput', 'stickySearchBtn'); // 추적 헤더
+    })();
+  </script>
+
+</body>
+</html>

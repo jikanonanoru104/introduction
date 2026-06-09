@@ -1599,18 +1599,24 @@
       var mapDiv = document.getElementById('naverMap');
       if (!mapDiv || typeof naver === 'undefined') return;
       
-      // 보내주신 링크의 정확한 주소지 좌표(위도: 37.4475, 경도: 126.7023)로 수정했습니다.
-      var location = new naver.maps.LatLng(37.4475, 126.7023);
+      // 네이버 검색 엔진 파라미터에서 추출한 가장 정밀한 6자리 물리 좌표로 고정합니다.
+      var location = new naver.maps.LatLng(37.447551, 126.702342);
       
       var map = new naver.maps.Map(mapDiv, {
         center: location,
-        zoom: 17 // 골목길과 건물 진입로가 잘 보이도록 줌 레벨을 17로 살짝 올렸습니다.
+        zoom: 17, // 건물 진입로와 주변 골목이 한눈에 보이는 최적의 배율
+        zoomControl: true, // 사용자가 지도를 확대/축소할 수 있도록 컨트롤러 추가
+        zoomControlOptions: {
+          position: naver.maps.Position.RIGHT_BOTTOM
+        }
       });
       
-      new naver.maps.Marker({
+      // 마커를 생성하고 지도 위에 올립니다.
+      var marker = new naver.maps.Marker({
         position: location,
         map: map,
-        title: '(주)엔엔터테인먼트'
+        title: '(주)엔엔터테인먼트',
+        animation: naver.maps.Animation.DROP // 지도가 로드될 때 마커가 통통 떨어지는 효과
       });
     })();
   </script>

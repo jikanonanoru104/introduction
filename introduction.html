@@ -1599,24 +1599,23 @@
       var mapDiv = document.getElementById('naverMap');
       if (!mapDiv || typeof naver === 'undefined') return;
       
-      // 네이버 검색 엔진 파라미터에서 추출한 가장 정밀한 6자리 물리 좌표로 고정합니다.
-      var location = new naver.maps.LatLng(37.447551, 126.702342);
+      // 요청하신 정밀 도·분·초 좌표를 네이버 지도 API 전용 소수점 좌표로 변환하여 적용합니다.
+      var location = new naver.maps.LatLng(37.444381, 126.698506);
       
       var map = new naver.maps.Map(mapDiv, {
         center: location,
-        zoom: 17, // 건물 진입로와 주변 골목이 한눈에 보이는 최적의 배율
-        zoomControl: true, // 사용자가 지도를 확대/축소할 수 있도록 컨트롤러 추가
+        zoom: 17, // 건물 위치가 명확히 보이는 최적의 배율
+        zoomControl: true,
         zoomControlOptions: {
           position: naver.maps.Position.RIGHT_BOTTOM
         }
       });
       
-      // 마커를 생성하고 지도 위에 올립니다.
-      var marker = new naver.maps.Marker({
+      new naver.maps.Marker({
         position: location,
         map: map,
         title: '(주)엔엔터테인먼트',
-        animation: naver.maps.Animation.DROP // 지도가 로드될 때 마커가 통통 떨어지는 효과
+        animation: naver.maps.Animation.DROP
       });
     })();
   </script>

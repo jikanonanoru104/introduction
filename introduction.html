@@ -1593,16 +1593,20 @@
   </script>
 
   <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=sr3c3r0mbt"></script>
-  <script>
+<script>
     /* ── 네이버 지도 ── */
     (function () {
       var mapDiv = document.getElementById('naverMap');
       if (!mapDiv || typeof naver === 'undefined') return;
-      var location = new naver.maps.LatLng(37.4487, 126.7314);
+      
+      // 보내주신 링크의 정확한 주소지 좌표(위도: 37.4475, 경도: 126.7023)로 수정했습니다.
+      var location = new naver.maps.LatLng(37.4475, 126.7023);
+      
       var map = new naver.maps.Map(mapDiv, {
         center: location,
-        zoom: 16
+        zoom: 17 // 골목길과 건물 진입로가 잘 보이도록 줌 레벨을 17로 살짝 올렸습니다.
       });
+      
       new naver.maps.Marker({
         position: location,
         map: map,

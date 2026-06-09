@@ -690,6 +690,46 @@
     body.tab-nmedia   .hero-main { display: none; }
 
     /* =============================================
+       최상단 이동 버튼
+    ============================================= */
+    .top-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 300;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+      pointer-events: none;
+    }
+    .top-btn.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .top-btn:hover { background: rgba(255,255,255,0.28); }
+    .top-btn svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: rgba(0,0,0,0.7);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* =============================================
        회사소개 전용 헤더
     ============================================= */
     .about-header {
@@ -1062,6 +1102,10 @@
     </div>
   </header>
 
+  <button class="top-btn" id="topBtn" aria-label="최상단으로">
+    <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
   <main>
 
     <!-- =============================================
@@ -1315,13 +1359,13 @@
       <section class="stat-bar">
         <div class="stat-bar__inner">
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">3<span class="stat-item__unit">단계</span></span>
+            <span class="stat-item__label">가격 체계</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">7<span class="stat-item__unit">종</span></span>
+            <span class="stat-item__label">서비스 품목</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
@@ -1330,8 +1374,8 @@
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">당일<span class="stat-item__unit">~</span></span>
+            <span class="stat-item__label">빠른 시안 제공</span>
           </div>
         </div>
       </section>
@@ -1389,23 +1433,23 @@
       <section class="stat-bar">
         <div class="stat-bar__inner">
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">25<span class="stat-item__unit">건+</span></span>
+            <span class="stat-item__label">영상 제작 실적</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">온·오프<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">동시 중계 가능</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">멀티<span class="stat-item__unit">캠</span></span>
+            <span class="stat-item__label">현장 중계</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-item__num">-<span class="stat-item__unit"></span></span>
-            <span class="stat-item__label">예시</span>
+            <span class="stat-item__num">VOD<span class="stat-item__unit"></span></span>
+            <span class="stat-item__label">편집·납품 포함</span>
           </div>
         </div>
       </section>
@@ -1498,6 +1542,21 @@
   </footer>
 
   <script>
+    /* ── 최상단 이동 버튼 ── */
+    (function () {
+      var topBtn = document.getElementById('topBtn');
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 300) {
+          topBtn.classList.add('is-visible');
+        } else {
+          topBtn.classList.remove('is-visible');
+        }
+      });
+      topBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    })();
+
     /* ── 브랜드 탭 전환 ── */
     (function () {
       var panels  = document.querySelectorAll('.brand-panel');
